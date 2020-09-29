@@ -10,8 +10,6 @@ SquareWaveformGenerator swg;
 
 #include "controllers.h"
 #include "gameimages.h"
-#include "support.h"
-#include "soundchip.h"
 
 #define JOY_LEFT 13
 #define JOY_RIGHT 2
@@ -26,6 +24,9 @@ GameControllerKeys       cKeysASTF;
 GameControllerKeys       cKeysQAOP;
 
 GameController *gameControllers[] = { &cNone, &cMouse, &cJoystick, &cKeysArrows, &cKeysASTF, &cKeysQAOP };
+
+#include "support.h"
+#include "soundchip.h"
 
 #include "score.h"
 #include "race.h"
@@ -56,24 +57,33 @@ void setup()
   initNumbers();  
 
   SPIFFS.begin(true);      
-  loadScore();
+  //loadScore();
   highScore = top[0].points;
   fastest = top[0].timesec; 
+  lowestTopScore = top[HIGHSCORE_ITEMS-1].points;
 }
+
 
 void loop()
 {
     static int exitv = 0;    
+    static int editItem = -1;
+
+    playTuc();
+    waitNoButton(250); // No button pressing between scene change
     
     if ( exitv == 2 )
     { 
       Score score;
-      score.start();
-      exitv = score.exitvalue;
-      exitv = 0;
+      score.editItem = editItem;      
+      score.start();      
+      editItem = -1;
+      exitv = score.exitvalue;      
     }    
     else if ( exitv == 1 )
     {
+      
+      
       Race race;
       race.players[0].controller = gameControllers[playercontrol[0]];
       race.players[1].controller = gameControllers[playercontrol[1]];
@@ -81,17 +91,21 @@ void loop()
       exitv = 2; // or 4
 
       if( exitv == 2 )
-      {
-        if( addScore(   "AAA", 
+      {        
+        ScoreCard *psc = addScore(   "AAA", 
                         race.players[race.winner].points, 
                         race.winnerTime, 
                         race.players[race.winner].cars, 
                         race.players[race.winner].controller->id, 
-                        (gameControllers[playercontrol[0]]->id!=0?1:0)+(gameControllers[playercontrol[1]]->id!=0?1:0)) != NULL)
+                        (gameControllers[playercontrol[0]]->id!=0?1:0)+(gameControllers[playercontrol[1]]->id!=0?1:0));
+
+        if( psc != NULL )
           {
+            editItem = getScoreIndex( psc ); // to set initials
             saveScore();
             highScore = top[0].points;
             fastest = top[0].timesec;    
+            lowestTopScore = top[HIGHSCORE_ITEMS-1].points;
           }
       }
     }

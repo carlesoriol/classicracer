@@ -7,8 +7,9 @@
 
 #define RACE_TIMEOUT (60L*1000L*5)
 
-
 int RACECARS = 10;
+
+#define NOCRASH_BONUS (RACECARS*3)
 
 struct Race : public Scene
 {
@@ -16,7 +17,7 @@ struct Race : public Scene
     : Scene(8, 20, VGAController.getViewPortWidth(), VGAController.getViewPortHeight())
   {
   }
-  
+
   Bitmap cariconl = Bitmap(8, 8, bitmap_cariconleft_data, PixelFormat::Mask, RGB888(255, 255, 0));
   Bitmap cariconr = Bitmap(8, 8, bitmap_cariconright_data, PixelFormat::Mask, RGB888(255, 255, 0));
 
@@ -48,6 +49,14 @@ struct Race : public Scene
       carWheelSound.enable(true);
     }
 
+    void noSound()
+    {
+      carEngineSound.enable(false);
+      carAdvanceSound.enable(false);
+      carCrashSound.enable(false);
+      carWheelSound.enable(false);
+    }
+
     void stop(void)
     {
       soundGenerator.detach(&carEngineSound);
@@ -60,7 +69,10 @@ struct Race : public Scene
     {
       sprite = sprite_; minx = minx_; maxx = maxx_; player = num_;
 
-      if ( controller->mode == MODE_NONE ) { sprite->visible = false; yspeed = 120+random(-50,50); }
+      if ( controller->mode == MODE_NONE ) {
+        sprite->visible = false;
+        yspeed = 120 + random(-50, 50);
+      }
     }
 
     void checkX( )
@@ -97,7 +109,7 @@ struct Race : public Scene
       if ( points < 0) points = 0;
 
       showSpeed();
-      dcrashx = ((sprite->x - x) * (yspeed/80))/2+random(-10,10);      
+      dcrashx = ((sprite->x - x) * (yspeed / 80)) / 2 + random(-10, 10);
     }
 
     void crashedTimeout()
@@ -105,7 +117,7 @@ struct Race : public Scene
       static int compta = 0;
 
       compta ++;
-      
+
       if ( crashTime + TIME_AFTER_CRASH < millis() )
       {
         crashed = false;
@@ -124,19 +136,19 @@ struct Race : public Scene
 
         //if( compta % 4 == 0)
         {
-          sprite->x+=dcrashx;
-          if( sprite->x < minx)
+          sprite->x += dcrashx;
+          if ( sprite->x < minx)
           {
             sprite->x = minx;
             dcrashx *= -1;
           }
-          if( sprite->x > maxx)
+          if ( sprite->x > maxx)
           {
             sprite->x = maxx;
             dcrashx *= -1;
           }
 
-          dcrashx = (dcrashx * 999)/1000;
+          dcrashx = (dcrashx * 999) / 1000;
         }
       }
       drawCrashedCars();
@@ -145,36 +157,40 @@ struct Race : public Scene
     void accelerateAndMove( )
     {
       controller->update();
-      
+
       if ((controller->isButtonA() || controller->isUp()) && (yspeed  < MAXSPEED))
         yspeed += 2;
 
       if (controller->isDown() )
         yspeed = (yspeed * 95) / 100;
 
-      if ( controller->isRight() )
+      if (controller->mode != MODE_RELATIVEPOS )
       {
-        if ( xspeed < 0)  xspeed = 0;   // change direction stop acceleration
-        if ( xspeed == 0) xspeed = 200; // minimum speed
-        else if ( xspeed < 500) xspeed += 25; // increase acceleration if maxiumum acceleration not reached
+
+        if ( controller->isRight() )
+        {
+          if ( xspeed < 0)  xspeed = 0;   // change direction stop acceleration
+          if ( xspeed == 0) xspeed = 200; // minimum speed
+          else if ( xspeed < 500) xspeed += 25; // increase acceleration if maxiumum acceleration not reached
+        }
+        else if ( controller->isLeft() )
+        {
+          if ( xspeed > 0)  xspeed = 0;     // change direction stop acceleration
+          if ( xspeed == 0) xspeed = -200;  // minimum speed
+          else if ( xspeed > -500) xspeed -= 25; // increase acceleration if maxiumum acceleration not reached
+        }
+        else
+          xspeed = 0;   // keys released stop acceleration
       }
-      else if ( controller->isLeft() )
-      {
-        if ( xspeed > 0)  xspeed = 0;     // change direction stop acceleration
-        if ( xspeed == 0) xspeed = -200;  // minimum speed
-        else if ( xspeed > -500) xspeed -= 25; // increase acceleration if maxiumum acceleration not reached
-      }
-      else
-        xspeed = 0;   // keys released stop acceleration
 
       if (controller->mode == MODE_RELATIVEPOS && !crashed)
       {
         int dx = controller->getDX();
-        xspeed = 0;                
+        xspeed = 0;
         sprite->x += dx;
         checkX();
         xspeed += dx;
-        wheel_sound_mult = 20;          
+        wheel_sound_mult = 20;
       }
     }
 
@@ -221,7 +237,7 @@ struct Race : public Scene
 
     void doScore()
     {
-      if(sprite->visible)
+      if (sprite->visible)
         points += 5 + yspeed / 15;
       score++;
       carAdvanceSound.enable(false);
@@ -262,6 +278,7 @@ struct Race : public Scene
   long lastSpriteTime = 0;
   long cary[6];
   long startRaceTime = 0;
+  long currentTime = 0;
   int winner = 0;
   long winnerTime = 0L;
 
@@ -292,7 +309,7 @@ struct Race : public Scene
 
   void init()
   {
-    
+
     for ( int ncompta = 0; ncompta < 8; ncompta++)
       sprites[ncompta].visible = false;
 
@@ -346,7 +363,7 @@ struct Race : public Scene
   {
     static long lastDrawTime = -999999;
 
-    long currentTime = millis();
+    currentTime = millis();
     currentTime -= startRaceTime;
 
     if ( currentTime > lastDrawTime + 100)
@@ -392,13 +409,13 @@ struct Race : public Scene
     for (int ncompta = 0; ncompta < RACECARS; ncompta++)
     {
       canvas.setPixel(8 + 2 + (mapcars[ncompta] * 4) / 100,
-                      199 - (ncompta*200/RACECARS), Color::Red );
+                      200 - ((ncompta+1) * 200 / RACECARS), Color::Red );
 
       canvas.setPixel(306 + (mapcars[ncompta] * 4) / 100,
-                      199 - (ncompta*200/RACECARS), Color::Red );
+                      200 - ((ncompta+1) * 200 / RACECARS), Color::Red );
     }
 
-    
+
     canvas.setBrushColor(Color::Red);
     canvas.selectFont(&fabgl::FONT_8x8);
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
@@ -424,7 +441,7 @@ struct Race : public Scene
     canvas.drawBitmap(21 * 8, 23 * 8, &cariconr);
 
     drawPoints();
-    for (int player = 0; player < 2; player++)  players[player].showSpeed();    
+    for (int player = 0; player < 2; player++)  players[player].showSpeed();
 
   }
 
@@ -453,12 +470,12 @@ struct Race : public Scene
 
     if ( players[player].score > 0  && players[player].score <= RACECARS)
     {
-      int y = 199 - ((players[player].score - 1) * 200)/ RACECARS;
+      int y = 200 - ((players[player].score) * 200) / RACECARS;
       int x = ((player == 0) ? 8 : 304) ;
 
       canvas.setPenColor(((player == 0) ? RGB888(255, 255, 0) : RGB888(255, 255, 0)) );
       canvas.setBrushColor(RGB888(0xff, 0xff, 0));
-      canvas.fillRectangle( x + 1, y, x + 6, y+(200/RACECARS) );
+      canvas.fillRectangle( x + 1, y, x + 6, y + (200 / RACECARS) );
 
       //canvas.setPixel(x+1+(mapcars[players[player].score -1]*6)/100, y, Color::Red );
     }
@@ -473,16 +490,95 @@ struct Race : public Scene
   }
 
   void exitRace( int value )
-  {      
+  {
     canvas.waitCompletion();
     exitvalue = value;
-    players[0].stop();players[1].stop();
+    players[0].stop(); players[1].stop();
     VGAController.removeSprites();
-    this->stop();      
+    this->stop();
   }
-  
+
+
+  void slowDratText(int x, int y, const char *text, int dx = 8 )
+  {
+    char c[2];
+    *c = *text++;
+    c[1] = 0;
+
+    while ( *c != 0)
+    {
+      canvas.drawText(x, y, c );
+      *c = *text++;
+      x += dx;
+      vTaskDelay(20 / portTICK_PERIOD_MS);
+      canvas.waitCompletion();
+    }
+
+  }
+
+  void winAnimation( int player)
+  {
+    char buffer[32];
+
+    players[player].points = 5000;
+
+    checkered(players[player].minx + 1, 6 * 8, 120, 2 * 8, 8, 8);
+    checkered(players[player].minx + 1, 18 * 8, 120, 2 * 8, 8, 8);
+
+    canvas.setPenColor(RGB888(0xFF, 0XFF, 0xFF));
+    canvas.setBrushColor(RGB888(0x00, 0XFF, 0x00));
+    canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
+
+    slowDratText( players[player].minx + 2 * 8 + 1, 9 * 8, "YOU WON" );
+
+    sprintf( buffer, "SCORE:  %4d",      players[player].points );
+    slowDratText( players[player].minx + 2 * 8 + 1, 11 * 8, buffer );
+
+    sprintf( buffer, "TIME : %02d:%02d", (currentTime / 1000) / 60,  (currentTime / 1000) % 60 );
+    slowDratText( players[player].minx + 2 * 8 + 1, 12 * 8, buffer );
+
+    sprintf( buffer, "CARS :  %4d", players[player].cars  );
+    slowDratText( players[player].minx + 2 * 8 + 1, 13 * 8, buffer );
+
+    sprintf( buffer, "BONUS:  %4d", (players[player].cars == 0) ? NOCRASH_BONUS : 0);
+    slowDratText( players[player].minx + 2 * 8 + 1, 14 * 8, buffer);
+
+    if ( players[player].cars == 0) players[player].points += NOCRASH_BONUS;
+
+    bool bExit = false;
+    int ncompta = 0;
+    long tstart = millis();
+
+    while (!bExit )
+    {
+      ncompta++;
+      
+      for ( int ncont = 0; ncont < sizeof(gameControllers) / sizeof( GameController *); ncont++)
+      {
+        gameControllers[ncont]->update();
+        if ( gameControllers[ncont]->isButtonA() ) bExit = true;
+      }
+
+      if ( highScore < players[player].points)
+      {
+        canvas.setPenColor(scorecolors[ncompta%12]);
+        slowDratText( players[player].minx + 2 * 8 + 1, 16 * 8, " TOP RECORD ");            
+      }
+      else if ( lowestTopScore < players[player].points)
+      {
+        canvas.setPenColor( (ncompta % 2) ? RGB888(0x0, 0XFF, 0x0) : RGB888(0xFF, 0XFF, 0x0));         
+        slowDratText( players[player].minx + 2 * 8 + 1, 16 * 8, "HALL OF FAME");
+      }
+
+      canvas.waitCompletion();
+      vTaskDelay(10 / portTICK_PERIOD_MS);
+
+      if( millis()-tstart > 10000) bExit = true; // 10 seconds max time
+    }
+  }
+
   void update(int updateCount)
-  {   
+  {
     long currentTime = millis();
     long ellapsed = currentTime - lastSpriteTime;
 
@@ -531,15 +627,20 @@ struct Race : public Scene
 
     for ( int player = 0; player < 2; player++)
     {
-      if( players[player].score == RACECARS) // won
+      if ( players[player].score == RACECARS) // won
       {
-        winner = player;          
-        winnerTime = (millis()-startRaceTime)/1000;
-         exitRace( player );
-         delay(5000);
-         return;
+        winner = player;
+        winnerTime = (millis() - startRaceTime) / 1000;
+
+        players[0].noSound();
+        players[1].noSound();
+
+        winAnimation( player);
+        exitRace( player );
+
+        return;
       }
-      
+
       players[player].update();
       oldyspeed[player] = players[player].yspeed;     // keey old y speed
       oldx[player] = sprites[player].x;               // keep old x position
@@ -555,7 +656,7 @@ struct Race : public Scene
 
         if ( (players[player].lastCarSprite == 0 || sprites[players[player].lastCarSprite].y > nlevelcardelay) )
         {
-          if(  players[player].lastCar < RACECARS )
+          if (  players[player].lastCar < RACECARS )
           {
             int nsprite = getFirstFreeSprite();
             if (nsprite != 0)
@@ -563,14 +664,14 @@ struct Race : public Scene
               int xpos = mapcars[players[player].lastCar] ;
               players[player].lastCar++;
               players[player].lastCarSprite = nsprite;
-  
+
               sprites[nsprite].moveTo( ((player == 0) ? 23 : 175) + xpos , 0);
               sprites[nsprite].visible = true;
               cary[nsprite - 2] = -2400;
-  
+
             }
           }
-          
+
         }
       }
       else
@@ -626,7 +727,7 @@ struct Race : public Scene
     for ( int player = 0; player < 2; player++)
       players[player].accelerateAndMove();
 
-    
+
     static bool MkeyPressed = false;
     if (keyboard->isVKDown(fabgl::VK_F2) && !MkeyPressed)
     {
@@ -658,16 +759,16 @@ struct Race : public Scene
       if ( oldyspeed[player] != players[player].yspeed )
         players[player].showSpeed();
 
-      if( !players[player].crashed )
+      if ( !players[player].crashed )
       {
-      if ( oldx[player] < sprites[player].x ) sprites[player].setFrame(1);
-      else if ( oldx[player] > sprites[player].x ) sprites[player].setFrame(2);
-      else 
-      {
-        int wheeldiv = (1 + (4 - players[player].yspeed / 50));
-        if (wheeldiv < 1 ) wheeldiv = 1;
-        sprites[player].setFrame(5 + 2 - ((updateCount / wheeldiv) % 3));
-      }
+        if ( oldx[player] < sprites[player].x ) sprites[player].setFrame(1);
+        else if ( oldx[player] > sprites[player].x ) sprites[player].setFrame(2);
+        else
+        {
+          int wheeldiv = (1 + (4 - players[player].yspeed / 50));
+          if (wheeldiv < 1 ) wheeldiv = 1;
+          sprites[player].setFrame(5 + 2 - ((updateCount / wheeldiv) % 3));
+        }
       }
 
     }
@@ -679,7 +780,7 @@ struct Race : public Scene
     for ( int ncompta = 0; ncompta < 8; ncompta++)
       updateSpriteAndDetectCollisions(&sprites[ncompta]);
 
-    
+
     VGAController.refreshSprites();
     canvas.waitCompletion();
 
@@ -699,4 +800,4 @@ struct Race : public Scene
     }
   }
 
- };
+};

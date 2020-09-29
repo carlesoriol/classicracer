@@ -23,7 +23,7 @@ struct Menu : public Scene
   long menulastactivity = 0;     
   int exitvalue = -1;
   char *textControls[6] = { ".......", " MOUSE ", "JOYSTICK", " ARROWS ", "A S T F ", "Q A O P" };
-  bool lockedControls[4] = { false, false, false, false };
+  bool lockedControls[4] = { false, false, false, false };  
     
   void init()  
   {
@@ -72,6 +72,7 @@ struct Menu : public Scene
 
   void update( int updateCount )
   {    
+   
     int t= (updateCount/3) % 8; t = (t>4?8-t:t); // Bouncer
     
     canvas.setBrushColor(RGB888(0, 0xff, 0));

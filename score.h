@@ -14,7 +14,19 @@
 const char *scoreFileName = "/score.dat";
 
 int highScore;
+int lowestTopScore;
 int fastest;
+
+RGB888 scorecolors[12] = { RGB888(255, 0, 0),RGB888(255, 255, 128),RGB888(255, 0, 255),
+                                        RGB888(0, 0, 255),RGB888(128, 255, 255),RGB888(255, 255,0 ),
+                                        
+                                        RGB888(128, 0, 0),RGB888(0, 128, 0),RGB888(128, 0, 128),
+                                        RGB888(0, 0, 128),RGB888(0, 128, 128),RGB888(128, 128, 0),
+
+                                        //RGB888(0b11000000, 0, 0),RGB888(0b10000000, 0, 0b00000000),RGB888(0b10000000, 0, 0b01000000),
+                                        //RGB888(0b10000000, 0, 0b10000000),RGB888(0b01000000, 0, 0b10000000),RGB888(0b00000000, 0, 0b11000000),
+                                        
+                                        };
 
 struct ScoreCard
 {
@@ -72,6 +84,14 @@ int getScorePosition(  int points )
   return -1;
 }
 
+int getScoreIndex( ScoreCard *psc )
+{
+  for (int compta = 0; compta < HIGHSCORE_ITEMS; compta++)
+    if( &top[compta]== psc )
+       return compta;
+ return -1;
+}
+
 ScoreCard *allocScore( int points)
 {
   int n = getScorePosition( points );
@@ -106,10 +126,13 @@ struct Score : public Scene
   Bitmap bitmap_cariconright = Bitmap(8, 8, bitmap_car_to_right_data, PixelFormat::Mask, RGB888(0, 0, 255));
   Sprite sprites[1];
   int exitvalue = 0;
-
+  int editItem = -1; // item number to edit
+  int editInitial = 0; // 0 to 3
+  int currentStart = 0;
 
   bool checkExit()
   {
+    if( editItem != -1 ) return false;
     for( int ncont = 0; ncont < sizeof(gameControllers) / sizeof( GameController *); ncont++)
     { 
       gameControllers[ncont]->update();
@@ -137,7 +160,7 @@ struct Score : public Scene
       sprites[0].visible = true;
       VGAController.refreshSprites();     
       canvas.waitCompletion();     
-      delay(DELAYDRAW_MILLIS); 
+      vTaskDelay(DELAYDRAW_MILLIS/portTICK_PERIOD_MS);      
     }
   }
 
@@ -160,6 +183,8 @@ struct Score : public Scene
     
   }
 
+      
+
   void drawScores()
   {
         Bitmap bitmap_classicracer = Bitmap(21*8, 16, bitmap_classicracer_data, PixelFormat::Mask, RGB888(255, 255, 255));      
@@ -167,16 +192,7 @@ struct Score : public Scene
                                               bitmap_mouse_data, bitmap_joystick_data,
                                               bitmap_keybb_data, bitmap_keyba_data,  bitmap_keybo_data  };
       
-    RGB888 scorecolors[12] = { RGB888(255, 0, 0),RGB888(255, 255, 128),RGB888(255, 0, 255),
-                                            RGB888(0, 0, 255),RGB888(128, 255, 255),RGB888(255, 255,0 ),
-                                            
-                                            RGB888(128, 0, 0),RGB888(0, 128, 0),RGB888(128, 0, 128),
-                                            RGB888(0, 0, 128),RGB888(0, 128, 128),RGB888(128, 128, 0),
 
-                                            //RGB888(0b11000000, 0, 0),RGB888(0b10000000, 0, 0b00000000),RGB888(0b10000000, 0, 0b01000000),
-                                            //RGB888(0b10000000, 0, 0b10000000),RGB888(0b01000000, 0, 0b10000000),RGB888(0b00000000, 0, 0b11000000),
-                                            
-                                            };
 
     int nselected = 1;
     
@@ -196,42 +212,54 @@ struct Score : public Scene
     canvas.drawText(9*8, 10*8, "NAME SCORE TIME CARS GAME");
     slowRefresh();
 
-    static int currentStart = 0;
+
+
+    if( editItem != -1) currentStart = editItem;
  
     for (int ncompta = 0; ncompta < 6; ncompta++)
     {
       char buffer[16];
       int y = (12+ncompta*2) * 8;
-      ScoreCard *ptop = &top[ncompta+currentStart];
-      
-      canvas.setPenColor(scorecolors[ncompta+currentStart]);
 
-      sprintf( buffer, "%2d", ncompta+currentStart+1 );
-      slowDratText(6*8, y, buffer);
-      slowDratText(9*8, y, ptop->initials);
-      sprintf( buffer, "%4d", ptop->points );
-      slowDratText(14*8, y, buffer);
-      sprintf( buffer, "%01d:%02d", ptop->timesec/60, ptop->timesec%60 );
-      slowDratText(20*8, y, buffer);
-      sprintf( buffer, "%2d", ptop->crashed );      
-      slowDratText(26*8, y, buffer);
-
-      Bitmap bitmap_control = Bitmap(8, 8, bitmap_controls_list[ptop->controler], PixelFormat::Mask, scorecolors[ncompta+currentStart]);
-      canvas.drawBitmap( 30*8, y, &bitmap_control );  
-      slowRefresh(31*8);
-
-      Bitmap bitmap_caricon = Bitmap(8, 8, bitmap_caricon_data, PixelFormat::Mask, scorecolors[ncompta+currentStart]);
-      canvas.drawBitmap( 32*8, y, &bitmap_caricon );  
-      slowRefresh(33*8);
-      
-      if( ptop->gameplayers == 2)
-      {
-        Bitmap bitmap_cariconr = Bitmap(8, 8, bitmap_cariconright_data, PixelFormat::Mask, scorecolors[ncompta+currentStart]);
-        canvas.drawBitmap( 33*8, y, &bitmap_cariconr );        
-        slowRefresh(34*8);
+      if( ncompta+currentStart < HIGHSCORE_ITEMS )
+      {      
+        ScoreCard *ptop = &top[ncompta+currentStart];        
+        
+        canvas.setPenColor(scorecolors[ncompta+currentStart]);
+  
+        sprintf( buffer, "%2d", ncompta+currentStart+1 );
+        slowDratText(6*8, y, buffer);
+        slowDratText(9*8, y, ptop->initials);
+        sprintf( buffer, "%4d", ptop->points );
+        slowDratText(14*8, y, buffer);
+        sprintf( buffer, "%01d:%02d", ptop->timesec/60, ptop->timesec%60 );
+        slowDratText(20*8, y, buffer);
+        sprintf( buffer, "%2d", ptop->crashed );      
+        slowDratText(26*8, y, buffer);
+  
+        Bitmap bitmap_control = Bitmap(8, 8, bitmap_controls_list[ptop->controler], PixelFormat::Mask, scorecolors[ncompta+currentStart]);
+        canvas.drawBitmap( 30*8, y, &bitmap_control );  
+        slowRefresh(31*8);
+  
+        Bitmap bitmap_caricon = Bitmap(8, 8, bitmap_caricon_data, PixelFormat::Mask, scorecolors[ncompta+currentStart]);
+        canvas.drawBitmap( 32*8, y, &bitmap_caricon );  
+        slowRefresh(33*8);
+        
+        if( ptop->gameplayers == 2)
+        {
+          Bitmap bitmap_cariconr = Bitmap(8, 8, bitmap_cariconright_data, PixelFormat::Mask, scorecolors[ncompta+currentStart]);
+          canvas.drawBitmap( 33*8, y, &bitmap_cariconr );        
+          slowRefresh(34*8);
+        }
       }
       
       slowRefresh(-1, 400);
+    }
+
+    if( editItem != -1)
+    {
+      canvas.setPenColor( RGB888(255,255,255) );
+      canvas.drawRectangle( 9*8 - 4, 12*8 - 4, 12*8 + 3, 13*8+3); 
     }
   
     currentStart += 6;
@@ -246,6 +274,8 @@ struct Score : public Scene
 
   void init()
   {   
+    if( editItem != -1 )currentStart = 0;
+    editInitial = 0;
     scorelastactivity = millis();
     sprites[0].addBitmap(&bitmap_cariconright);
     sprites[0].visible = false;
@@ -256,31 +286,83 @@ struct Score : public Scene
 
 
   void update( int updateCount )
-  {  
-    checkExit();
+  { 
     
-     if( bExit ) 
-      {
-        canvas.waitCompletion();  
-        exitvalue = 0;        
-        VGAController.removeSprites();
-        this->stop();  
-        return;    
+    if( editItem == -1 )
+      checkExit();
+    else
+    {
+    
+      bool bleft = false;
+      bool bright = false;
+      bool bfire = false;     
+      
+      for( int ncont = 0; ncont < sizeof(gameControllers) / sizeof( GameController *); ncont++)
+      { 
+        gameControllers[ncont]->update();
+        if( gameControllers[ncont]->isLeft() ) bleft = true;
+        if( gameControllers[ncont]->isRight() ) bright = true;
+        if( gameControllers[ncont]->isButtonA() ) bfire = true;
       }
+
+      if( bleft || bright || bfire )
+      {        
+        if( bleft ) top[editItem].initials[editInitial]--;
+        if( bright ) top[editItem].initials[editInitial]++;
+        if( top[editItem].initials[editInitial] < 'A' ) top[editItem].initials[editInitial] = 'Z';
+        if( top[editItem].initials[editInitial] > 'Z' ) top[editItem].initials[editInitial] = 'A';
+        
+        if( bfire)
+        {
+          editInitial++;          
+          playPic();
+          waitNoButton(1000);           // 1s max
+        }
+        else
+          playPong();
+             
+        canvas.setPenColor(scorecolors[editItem]);
+        canvas.setBrushColor(RGB888(0,255,0) );
+        canvas.drawText(9*8, 12*8, top[editItem].initials);             
+        vTaskDelay(50/portTICK_PERIOD_MS);
+   
+        if(editInitial == 3 )
+        {
+            saveScore();
+            bExit = true;
+            exitvalue = 2;
+            editItem = -1;
+            VGAController.removeSprites();
+            this->stop();                
+            return;
+        }
+      }
+
+        char c[2];
+        c[1]= 0;
+        c[0]= top[editItem].initials[editInitial];        
+        canvas.setPenColor(millis()%250 > 125 == 0 ? RGB888(0,255,0):scorecolors[editItem] );  
+        canvas.setBrushColor(RGB888(0,255,0) );             
+        canvas.drawText((9+editInitial)*8, 12*8, c);      
+        canvas.waitCompletion(); 
+    }
+
     
-     if ( millis() > scorelastactivity + SCORE_TIMEOUT )
+     if ( bExit || millis() > scorelastactivity + SCORE_TIMEOUT )
      {
           canvas.waitCompletion();  
           exitvalue = 0;
+          editItem = -1;
           VGAController.removeSprites();
           this->stop();                
           return;
      }
  
-    if (millis() > lastDraw+REDRAW_EVERY )
+    if (millis() > lastDraw+REDRAW_EVERY && editItem == -1 )
       drawScores();
 
-      canvas.waitCompletion();
+     canvas.waitCompletion();
+     vTaskDelay(10/portTICK_PERIOD_MS);
   }
  
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint  ) {}

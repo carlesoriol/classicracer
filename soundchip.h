@@ -100,7 +100,7 @@ void playSound( playsounddata ps )
 void  syncPlaySound( playsounddata psd)
 {
   playSound( psd);
-  delay(psd.durationms);
+   vTaskDelay(psd.durationms/portTICK_PERIOD_MS);
 }
 
 

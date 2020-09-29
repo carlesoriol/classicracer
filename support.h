@@ -54,6 +54,62 @@ void initNumbers( void )
       numbers_bitmaps[ncompta].loadBWImageScale( FONT_WIDTH, FONT_HEIGHT, FONT_SCALE, number_data_3x5[ncompta], RGB888(255, 255, 0));
 }
 
+void fillRect( int x, int y, int w, int h, fabgl::RGB888 const &overcolor)
+{
+  canvas.setBrushColor(  overcolor );
+  
+}
+
+void checkered(int x, int y, int w, int h, int cw, int ch )
+{
+  
+  for( int py = y; py < y+h; py+=ch)  
+    for( int px = x; px < x+w; px+=cw)
+    {      
+      int dx= maxInt(px, x);
+      int dy= maxInt(py, y);
+      
+      int dex = minInt(px+cw-1, x+w-1);      
+      int dey = minInt(py+ch-1, y+h-1);
+
+      if( dex > x && dey > y)
+      {
+        canvas.setBrushColor( (int)(((px/cw+py/ch) % 2) == 0) ? RGB888(255,255,255) : RGB888(0,0,0) );
+        canvas.fillRectangle( dx, dy, dex, dey );
+      }
+    }
+      
+}
+
+void waitButton(void)
+{
+  while(true)  
+   for( int ncont = 0; ncont < sizeof(gameControllers) / sizeof( GameController *); ncont++)
+      { 
+        gameControllers[ncont]->update();
+          if( gameControllers[ncont]->isButtonA() ) return;
+      }
+}
+
+void waitNoButton(long timeout = 0)
+{
+  long start = millis();
+  bool bExit = false;
+  
+  while(!bExit)   
+  {    
+    bExit = true;
+    
+    for( int ncont = 0; ncont < sizeof(gameControllers) / sizeof( GameController *); ncont++)
+      { 
+        gameControllers[ncont]->update();
+        if( gameControllers[ncont]->isButtonA() ) bExit = false;
+      }
+
+    if( millis()-start > timeout ) bExit = true;
+  }
+}
+
 void DEBUG( String str)
 {
   Serial.println( str); delay(10);
