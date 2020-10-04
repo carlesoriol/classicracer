@@ -513,21 +513,15 @@ struct Race : public Scene
   }
 
 
-  void slowDratText(int x, int y, const char *text, int dx = 8 )
+  void slowDrawText(int x, int y, const char *text, int dx = 8 )
   {
-    char c[2];
-    *c = *text++;
-    c[1] = 0;
-
-    while ( *c != 0)
+    while ( *text )
     {
-      canvas.drawText(x, y, c );
-      *c = *text++;
+      canvas.drawChar(x, y, *text++ );      
       x += dx;
       vTaskDelay(20 / portTICK_PERIOD_MS);
       canvas.waitCompletion();
     }
-
   }
 
   void winAnimation( int player)
@@ -541,19 +535,19 @@ struct Race : public Scene
     canvas.setBrushColor(RGB888(0x00, 0XFF, 0x00));
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
 
-    slowDratText( players[player].minx + 2 * 8 + 1, 9 * 8, "YOU WON" );
+    slowDrawText( players[player].minx + 2 * 8 + 1, 9 * 8, "YOU WON" );
 
     sprintf( buffer, "SCORE:  %4d",      players[player].points );
-    slowDratText( players[player].minx + 2 * 8 + 1, 11 * 8, buffer );
+    slowDrawText( players[player].minx + 2 * 8 + 1, 11 * 8, buffer );
 
     sprintf( buffer, "TIME : %02d:%02d", (currentTime / 1000) / 60,  (currentTime / 1000) % 60 );
-    slowDratText( players[player].minx + 2 * 8 + 1, 12 * 8, buffer );
+    slowDrawText( players[player].minx + 2 * 8 + 1, 12 * 8, buffer );
 
     sprintf( buffer, "CARS :  %4d", players[player].cars  );
-    slowDratText( players[player].minx + 2 * 8 + 1, 13 * 8, buffer );
+    slowDrawText( players[player].minx + 2 * 8 + 1, 13 * 8, buffer );
 
     sprintf( buffer, "BONUS:  %4d", (players[player].cars == 0) ? NOCRASH_BONUS : 0);
-    slowDratText( players[player].minx + 2 * 8 + 1, 14 * 8, buffer);
+    slowDrawText( players[player].minx + 2 * 8 + 1, 14 * 8, buffer);
 
     if ( players[player].cars == 0) players[player].points += NOCRASH_BONUS;
 
@@ -574,12 +568,12 @@ struct Race : public Scene
       if ( highScore < players[player].points)
       {
         canvas.setPenColor(scorecolors[ncompta%12]);
-        slowDratText( players[player].minx + 2 * 8 + 1, 16 * 8, " TOP RECORD ");            
+        slowDrawText( players[player].minx + 2 * 8 + 1, 16 * 8, " TOP RECORD ");            
       }
       else if ( lowestTopScore < players[player].points)
       {
         canvas.setPenColor( (ncompta % 2) ? RGB888(0x0, 0XFF, 0x0) : RGB888(0xFF, 0XFF, 0x0));         
-        slowDratText( players[player].minx + 2 * 8 + 1, 16 * 8, "HALL OF FAME");
+        slowDrawText( players[player].minx + 2 * 8 + 1, 16 * 8, "HALL OF FAME");
       }
 
       canvas.waitCompletion();

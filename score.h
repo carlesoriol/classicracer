@@ -154,17 +154,12 @@ struct Score : public Scene
     }
   }
 
-  void slowDratText(int x, int y, const char *text, int dx=8 )
+  void slowDrawText(int x, int y, const char *text, int dx=8 )
   {
-    char c[2];
-    c[1] = 0;
-    
-    *c = *text++;
     slowRefresh( x, y );    
-    while ( *c!= 0)
+    while( *text )
     {
-      canvas.drawText(x, y, c );
-      *c = *text++;
+      drawChar( x, y, *text++);
       x += dx;
       slowRefresh( x+8, y );
       checkExit();
@@ -210,14 +205,14 @@ struct Score : public Scene
         canvas.setPenColor(scorecolors[ncompta+currentStart]);
   
         sprintf( buffer, "%2d", ncompta+currentStart+1 );
-        slowDratText(6*8, y, buffer);
-        slowDratText(9*8, y, ptop->initials);
+        slowDrawText(6*8, y, buffer);
+        slowDrawText(9*8, y, ptop->initials);
         sprintf( buffer, "%4d", ptop->points );
-        slowDratText(14*8, y, buffer);
+        slowDrawText(14*8, y, buffer);
         sprintf( buffer, "%01d:%02d", ptop->timesec/60, ptop->timesec%60 );
-        slowDratText(20*8, y, buffer);
+        slowDrawText(20*8, y, buffer);
         sprintf( buffer, "%2d", ptop->crashed );      
-        slowDratText(26*8, y, buffer);
+        slowDrawText(26*8, y, buffer);
   
         Bitmap bitmap_control = Bitmap(8, 8, bitmap_controls_list[ptop->controler], PixelFormat::Mask, scorecolors[ncompta+currentStart]);
         canvas.drawBitmap( 30*8, y, &bitmap_control );  
@@ -315,12 +310,9 @@ struct Score : public Scene
         }
       }
 
-        char c[2];
-        c[1]= 0;
-        c[0]= top[editItem].initials[editInitial];        
         canvas.setPenColor(millis()%250 > 125 == 0 ? RGB888(0,255,0):scorecolors[editItem] );  
         canvas.setBrushColor(RGB888(0,255,0) );             
-        canvas.drawText((9+editInitial)*8, 12*8, c);      
+        canvas.drawChar((9+editInitial)*8, 12*8, top[editItem].initials[editInitial]);      
         canvas.waitCompletion(); 
     }
 

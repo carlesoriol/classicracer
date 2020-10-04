@@ -7,9 +7,18 @@
 int maxInt( int a, int b ) { return MAX(a,b);}
 int minInt( int a, int b ) { return MIN(a,b);}
 
+void drawChar( int x, int y, char c)
+{
+  char b[2] = {0,0};
+  b[1] = 0;
+  b[0]=c;
+
+  canvas.drawText( x, y, b );
+}
+
 void drawInt( int x, int y, int value, RGB888 const & color, char *prefix = NULL, char *sufix = NULL)
 {
-     canvas.selectFont(&fabgl::FONT_8x8);
+  canvas.selectFont(&fabgl::FONT_8x8);
      
   String towrite = "";
   if (prefix != NULL)
@@ -20,9 +29,9 @@ void drawInt( int x, int y, int value, RGB888 const & color, char *prefix = NULL
   if (sufix != NULL)
     towrite += sufix;
 
-    canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
-    canvas.setPenColor(color);
-    canvas.drawText(x, y, towrite.c_str());
+  canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
+  canvas.setPenColor(color);
+  canvas.drawText(x, y, towrite.c_str());
 }
 
 class BWScaleBitmap : public Bitmap
