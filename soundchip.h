@@ -4,7 +4,7 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define PLAY_SOUND_PRIORITY 3
+#define PLAY_SOUND_PRIORITY (configMAX_PRIORITIES - 1)
 
 enum wavetype { WAVE_SQUARE, WAVE_SINE, WAVE_TRIANGLE, WAVE_SAW, WAVE_NOISE };
 enum modfreqmode { MODFREQ_NONE, MODFREQ_TO_END, MODFREQ_TO_RELEASE, MODFREQ_TO_SUSTAIN  };
@@ -26,25 +26,21 @@ struct playsounddata
 };
 
 void iPlaySound( void *pvParameters )
-{  
+{
   playsounddata psd = *(playsounddata *)pvParameters;
 
   WaveformGenerator *pwave;
-  
-  if ( psd.wave == WAVE_SINE)          pwave = new SineWaveformGenerator();
-  else if (psd.wave == WAVE_TRIANGLE)  pwave = new TriangleWaveformGenerator();
-  else if (psd.wave == WAVE_SAW)       pwave = new SawtoothWaveformGenerator();
-  else if (psd.wave == WAVE_NOISE)     pwave = new NoiseWaveformGenerator();
-  else  /*(psd.wave == WAVE_SQUARE)*/  pwave = new SquareWaveformGenerator();
+  if ( psd.wave == WAVE_SQUARE)   pwave = new SquareWaveformGenerator();
+  if ( psd.wave == WAVE_SINE)     pwave = new SineWaveformGenerator();
+  if ( psd.wave == WAVE_TRIANGLE) pwave = new TriangleWaveformGenerator();
+  if ( psd.wave == WAVE_SAW)      pwave = new SawtoothWaveformGenerator();
+  if ( psd.wave == WAVE_NOISE)    pwave = new NoiseWaveformGenerator();
 
   int sustainVolume = psd.sustain * psd.volume / 127;
 
   soundGenerator.attach( pwave);
-
   pwave->setVolume( ((psd.attack == 0) ? ( (psd.decay != 0) ? psd.volume : sustainVolume) : 0) );
-
   pwave->setFrequency( psd.freq_start );
-
   pwave->enable(true );
 
   long startTime = millis();
@@ -80,20 +76,19 @@ void iPlaySound( void *pvParameters )
   soundGenerator.detach( pwave);
   pwave->enable( false );
   delete pwave;
-  
+
   vTaskDelete( NULL );
 }
 
-
 void playSound( playsounddata ps )
-{  
+{
   // Now set up two tasks to run independently.
   xTaskCreatePinnedToCore( iPlaySound,  "iPlaySound",
-                           1024,  // This stack size can be checked & adjusted by reading the Stack Highwater
+                           4096,  // This stack size can be checked & adjusted by reading the Stack Highwater
                            &ps, // sound as parameters
                            PLAY_SOUND_PRIORITY,  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
                            NULL,
-                           tskNO_AFFINITY);
+                           ARDUINO_RUNNING_CORE);
 }
 
 
@@ -104,17 +99,17 @@ void  syncPlaySound( playsounddata psd)
 }
 
 
-void playPic()
+void playSoundPic()
 {
   playSound ( {2, 1, 127, 3, WAVE_SQUARE, 127, 12, 977, 0, MODFREQ_NONE });
 }
 
-void playTuc()
+void playSoundTuc()
 {
   playSound ( {5, 0, 127, 39, WAVE_TRIANGLE, 127, 44, 352, 275, MODFREQ_TO_END} );
 }
 
-void playPong()
+void playSoundPong()
 {
   playSound ( {0, 1, 127, 8, WAVE_SQUARE, 127, 21, 392, 0, MODFREQ_NONE} );
 }

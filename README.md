@@ -5,7 +5,7 @@ A neo retro game
 
 Thanks to www.FabGL.com - 2019 by Fabrizio Di Vittorio for this amazing library. 
 
-Thanks to Shenzhen Xin Yuan Electronics for the funny TTGO VGA32 http://www.lilygo.cn/.
+Thanks to Shenzhen Xin Yuan Electronics for creating the funny TTGO VGA32 http://www.lilygo.cn/.
 
 I've enjoyed playing with it.
 

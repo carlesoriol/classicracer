@@ -7,7 +7,7 @@
 
 #define RACE_TIMEOUT (60L*1000L*5)
 
-int RACECARS = 10;
+int RACECARS = 200;
 
 #define NOCRASH_BONUS (RACECARS*3)
 
@@ -20,6 +20,20 @@ struct Race : public Scene
 
   Bitmap cariconl = Bitmap(8, 8, bitmap_cariconleft_data, PixelFormat::Mask, RGB888(255, 255, 0));
   Bitmap cariconr = Bitmap(8, 8, bitmap_cariconright_data, PixelFormat::Mask, RGB888(255, 255, 0));
+  Bitmap carbitmap = Bitmap(24, 21, carbitmap_data, PixelFormat::Mask, RGB888(0, 0, 255));
+  Bitmap carbitmap_prota = Bitmap(24, 21, carbitmap_data, PixelFormat::Mask, RGB888(255, 255, 0));
+  Bitmap carbitmap_dreta = Bitmap(24, 21, carbitmap_data_dreta, PixelFormat::Mask, RGB888(255, 255, 0));
+  Bitmap carbitmap_esquerra = Bitmap(24, 21, carbitmap_data_esquerra, PixelFormat::Mask, RGB888(255, 255, 0));
+  Bitmap carbitmap_crash = Bitmap(24, 21, carbitmap_data_crash, PixelFormat::Mask, RGB888(255, 191, 0));
+  Bitmap carbitmap_crash2 = Bitmap(24, 21, carbitmap_data_crash2, PixelFormat::Mask, RGB888(255, 64, 0));
+
+  Bitmap carbitmap_anim[3] = { Bitmap(24, 21, carbitmap_data_anim0, PixelFormat::Mask, RGB888(255, 255, 0)),
+                             Bitmap(24, 21, carbitmap_data_anim1, PixelFormat::Mask, RGB888(255, 255, 0)),
+                             Bitmap(24, 21, carbitmap_data_anim2, PixelFormat::Mask, RGB888(255, 255, 0)) };
+
+  Bitmap carbitmap_banim[3] = { Bitmap(24, 21, carbitmap_data_anim0, PixelFormat::Mask, RGB888(0, 0, 255)),
+                             Bitmap(24, 21, carbitmap_data_anim1, PixelFormat::Mask, RGB888(0, 0, 255)),
+                             Bitmap(24, 21, carbitmap_data_anim2, PixelFormat::Mask, RGB888(0, 0, 255)) };
 
   struct Player
   {
@@ -282,7 +296,7 @@ struct Race : public Scene
   int winner = 0;
   long winnerTime = 0L;
 
-  int exitvalue = -1;
+  int exitValue = -1;
 
   void setCarAdvanceSound()
   {
@@ -492,7 +506,7 @@ struct Race : public Scene
   void exitRace( int value )
   {
     canvas.waitCompletion();
-    exitvalue = value;
+    exitValue = value;
     players[0].stop(); players[1].stop();
     VGAController.removeSprites();
     this->stop();
@@ -519,8 +533,6 @@ struct Race : public Scene
   void winAnimation( int player)
   {
     char buffer[32];
-
-    players[player].points = 5000;
 
     checkered(players[player].minx + 1, 6 * 8, 120, 2 * 8, 8, 8);
     checkered(players[player].minx + 1, 18 * 8, 120, 2 * 8, 8, 8);

@@ -11,46 +11,22 @@ struct GameController
   int id = 0;     // device number assigned by client
   bool active = false;
 
-  GameController( int id_, gcmode mode_)
-  {
-    id = id_;
-    mode = mode_;
-  }
+  GameController( int id_, gcmode mode_) : id( id_ ), mode(mode_) { }
 
-  virtual bool isLeft()     {
-    return false;
-  };
-  virtual bool isRight()    {
-    return false;
-  };
-  virtual bool isUp()       {
-    return false;
-  };
-  virtual bool isDown()     {
-    return false;
-  };
-  virtual bool isButtonA()  {
-    return false;
-  };
-  virtual bool isButtonB()  {
-    return false;
-  };
-
-  virtual void update()  { };
-
-  virtual int getDX()       {
-    return 0;
-  }
-  virtual int getDY()       {
-    return 0;
-  }
-
+  virtual bool isLeft()     { return false;  };
+  virtual bool isRight()    { return false;  };
+  virtual bool isUp()       { return false;  };
+  virtual bool isDown()     { return false;  };
+  virtual bool isButtonA()  { return false;  };
+  virtual bool isButtonB()  { return false;  };
+  virtual int  getDX()      { return 0;  }
+  virtual int  getDY()      { return 0;  }
+  virtual void update()     { };
 };
 
 struct GameControllerKeys : public GameController
 {
   GameControllerKeys() : GameController( 0, MODE_DIRECTIONAL ) { }
-
 
   GameControllerKeys(int id_, VirtualKey up_ = fabgl::VK_NONE, VirtualKey down_ = fabgl::VK_NONE,
                      VirtualKey left_ = fabgl::VK_NONE, VirtualKey right_ = fabgl::VK_NONE,
@@ -74,60 +50,29 @@ struct GameControllerKeys : public GameController
     return keyboard->isVKDown(key);
   }
 
-  virtual bool isLeft() {
-    return getKeyStatus(left);
-  }
-  virtual bool isRight() {
-    return getKeyStatus(right);
-  }
-  virtual bool isUp() {
-    return getKeyStatus(up);
-  }
-  virtual bool isDown() {
-    return getKeyStatus(down);
-  }
-  virtual bool isButtonA() {
-    return getKeyStatus(buttonA);
-  }
-  virtual bool isButtonB() {
-    return getKeyStatus(buttonB);
-  }
-
-
+  virtual bool isLeft()    {    return getKeyStatus(left);  }
+  virtual bool isRight()   {    return getKeyStatus(right);  }
+  virtual bool isUp()      {    return getKeyStatus(up);  }
+  virtual bool isDown()    {    return getKeyStatus(down);  }
+  virtual bool isButtonA() {    return getKeyStatus(buttonA);  }
+  virtual bool isButtonB() {    return getKeyStatus(buttonB);  }
 };
+
+#define GCJ_PINMODE(A) { if(A##_!=-1){A=A##_;pinMode(A,INPUT_PULLDOWN);} }
 
 struct GameControllerJoystick : public GameController
 {
   GameControllerJoystick() : GameController( 0, MODE_DIRECTIONAL ) { }
-
   GameControllerJoystick( int id_, int pinUp_ = -1, int pinDown_ = -1, int pinLeft_ = -1, int pinRight_ = -1,
                           int pinButtonA_ = -1, int pinButtonB_ = -1)
     : GameController( id_, MODE_DIRECTIONAL )
   {
-    if ( pinUp_ != -1 )       {
-      pinUp = pinUp_;
-      pinMode( pinUp_, INPUT_PULLDOWN);
-    }
-    if ( pinDown_ != -1 )     {
-      pinDown = pinDown_;
-      pinMode( pinDown_, INPUT_PULLDOWN);
-    }
-    if ( pinLeft_ != -1 )     {
-      pinLeft = pinLeft_;
-      pinMode( pinLeft_, INPUT_PULLDOWN);
-    }
-    if ( pinRight_ != -1 )    {
-      pinRight = pinRight_;
-      pinMode( pinRight_, INPUT_PULLDOWN);
-    }
-    if ( pinButtonA_ != -1 )  {
-      pinButtonA = pinButtonA_;
-      pinMode( pinButtonA_, INPUT_PULLDOWN);
-    }
-    if ( pinButtonB_ != -1 )  {
-      pinButtonB = pinButtonB_;
-      pinMode( pinButtonB_, INPUT_PULLDOWN);
-    }
+    GCJ_PINMODE( pinUp );
+    GCJ_PINMODE( pinDown );
+    GCJ_PINMODE( pinLeft );
+    GCJ_PINMODE( pinRight );
+    GCJ_PINMODE( pinButtonA );
+    GCJ_PINMODE( pinButtonB );
   }
 
   int pinUp = -1;
@@ -137,24 +82,12 @@ struct GameControllerJoystick : public GameController
   int pinButtonA = -1;
   int pinButtonB = -1;
 
-  virtual bool isLeft()     {
-    return digitalRead(pinLeft);
-  }
-  virtual bool isRight()    {
-    return digitalRead(pinRight);
-  }
-  virtual bool isUp()       {
-    return digitalRead(pinUp);
-  }
-  virtual bool isDown()     {
-    return digitalRead(pinDown);
-  }
-  virtual bool isButtonA()  {
-    return digitalRead(pinButtonA);
-  }
-  virtual bool isButtonB()  {
-    return digitalRead(pinButtonB);
-  }
+  virtual bool isLeft()    {    return digitalRead(pinLeft);  }
+  virtual bool isRight()   {    return digitalRead(pinRight);  }
+  virtual bool isUp()      {    return digitalRead(pinUp);  }
+  virtual bool isDown()    {    return digitalRead(pinDown);  }
+  virtual bool isButtonA() {    return digitalRead(pinButtonA);  }
+  virtual bool isButtonB() {    return digitalRead(pinButtonB);  }
 };
 
 
@@ -215,30 +148,18 @@ struct GameControllerMouse : public GameController
       if ( dx < -RELATIVE_TO_DIRECTIONAL_OFFSET) bIsLeft = true;;
       if ( dy >  RELATIVE_TO_DIRECTIONAL_OFFSET) bIsDown = true;;
       if ( dy < -RELATIVE_TO_DIRECTIONAL_OFFSET) bIsUp = true;;
-      
+
     }
   }
 
-  virtual bool isLeft()     { dx = 0; return bIsLeft; }
-  virtual bool isRight()    { dx = 0; return bIsRight; }
-  //virtual bool isUp()     { dy = 0; return bIsUp; }  
-  //virtual bool isDown()   { dy = 0; return bIsDown; }
-
-  
+  virtual bool isLeft()     { dx = 0; return bIsLeft;  }
+  virtual bool isRight()    { dx = 0; return bIsRight;  }
   virtual bool isUp()       { return bLeftButton;  }
-  virtual bool isDown()     { return bRightButton; }
-  
+  virtual bool isDown()     { return bRightButton;  }
+
   virtual bool isButtonA()  { return bLeftButton; }
   virtual bool isButtonB()  { return bRightButton; }
 
-  int getDX() {
-    int v = dx;
-    dx = 0;
-    return v;
-  }
-  int getDY() {
-    int v = dy;
-    dy = 0;
-    return v;
-  }
+  int getDX() { int v = dx; dx = 0; return v;  }
+  int getDY() { int v = dy; dy = 0; return v;  }
 };

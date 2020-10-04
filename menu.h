@@ -18,51 +18,44 @@ struct Menu : public Scene
   {
   }
   
-
-  Bitmap bitmap_caricon;
   long menulastactivity = 0;     
-  int exitvalue = -1;
+  int exitValue = -1;
   char *textControls[6] = { ".......", " MOUSE ", "JOYSTICK", " ARROWS ", "A S T F ", "Q A O P" };
   bool lockedControls[4] = { false, false, false, false };  
     
   void init()  
   {
     menulastactivity = millis();
+    exitValue = -1;
     
     canvas.selectFont(&fabgl::FONT_8x8);
-    canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
-
-    Bitmap bitmap_classicracer = Bitmap(21*8, 16, bitmap_classicracer_data, PixelFormat::Mask, RGB888(255, 255, 255));   
-    bitmap_caricon = Bitmap(8, 8, bitmap_caricon_data, PixelFormat::Mask, RGB888(128, 128, 0));
+    canvas.setGlyphOptions(GlyphOptions().FillBackground(true));    
    
-    canvas.setBrushColor(RGB888(0, 0xff, 0));
+    canvas.setBrushColor(COLOR_GREEN);
     canvas.clear();
 
+    Bitmap bitmap_classicracer = Bitmap(21*8, 16, bitmap_classicracer_data, PixelFormat::Mask, RGB888(255, 255, 255));   
     canvas.drawBitmap( 10*8, 2*8, &bitmap_classicracer );    
-    canvas.setPenColor(RGB888(0xFF, 0xFF, 0));
+    canvas.setPenColor(COLOR_YELLOW);
     canvas.drawText(7*8, 5*8, "VIDEO COMPUTER SYSTEM");     
     canvas.drawText(5*8, 7*8, "GAME PROGRAM");     
-
-    canvas.drawText(4*8, 19*8, "MOUSE JOYSTICK ARROWS ASTF QAOP");      
-    
+    canvas.drawText(4*8, 19*8, "MOUSE JOYSTICK ARROWS ASTF QAOP");          
     canvas.setPenColor(RGB888(64, 64, 0));     
     canvas.drawText(16, 23*8, "A NEW FANWARE BY CARLES ORIOL - 2020");     
   
     canvas.waitCompletion();
   }
 
-
-
   void setControl( int direction, int control) // direction LEFT or RIGHT
   {
     if( !lockedControls[control-1] ) // debouncer
     {    
       if( direction == RIGHT) 
-        if( playercontrol[LEFT] == control) { playercontrol[LEFT] = 0; playPic(); }
-        else { playercontrol[RIGHT] = control; playPong(); }
+        if( playercontrol[LEFT] == control) { playercontrol[LEFT] = 0; playSoundPic(); }
+        else { playercontrol[RIGHT] = control; playSoundPong(); }
       else
-        if( playercontrol[RIGHT] == control) { playercontrol[RIGHT] = 0; playPic(); }
-        else { playercontrol[LEFT] = control; playPong(); } 
+        if( playercontrol[RIGHT] == control) { playercontrol[RIGHT] = 0; playSoundPic(); }
+        else { playercontrol[LEFT] = control; playSoundPong(); } 
   
         menulastactivity = millis();
      
@@ -72,20 +65,17 @@ struct Menu : public Scene
 
   void update( int updateCount )
   {    
-   
     int t= (updateCount/3) % 8; t = (t>4?8-t:t); // Bouncer
     
-    canvas.setBrushColor(RGB888(0, 0xff, 0));
+    canvas.setBrushColor(COLOR_GREEN);
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
-    canvas.setPenColor(RGB888(0xff, 0xff, 0xff));
-    //canvas.fillRectangle(0, 13*8, 299, 14*8-1); 
-    //canvas.drawText(MIDDLE_POS-16-(( playercontrol[0] == 0 && playercontrol[1] == 0)?t:0), 10*8, " SELECT CONTROLS ");          
+    canvas.setPenColor(COLOR_WHITE);
     canvas.drawText(MIDDLE_POS-16, 10*8, " SELECT CONTROLS ");          
-    canvas.setPenColor(RGB888(0xff, 0xff, 0x00));
+    canvas.setPenColor(COLOR_YELLOW);
     canvas.drawText(LEFT_POS-3*8, 12*8, "LEFT PLAYER");          
     canvas.drawText(RIGHT_POS-5*8, 12*8, "RIGHT PLAYER");          
 
-    canvas.setPenColor(RGB888(0xff, 0, 0));
+    canvas.setPenColor(COLOR_RED);
     canvas.fillRectangle(0, 14*8, 299, 15*8-1);
     canvas.drawText(LEFT_POS-1*8, 14*8, textControls[playercontrol[LEFT]]);
     canvas.drawText(RIGHT_POS-3*8, 14*8, textControls[playercontrol[RIGHT]]);
@@ -94,12 +84,12 @@ struct Menu : public Scene
     
     if( playercontrol[0] != 0 || playercontrol[1] != 0)
     {
-      canvas.setPenColor(RGB888(0xff, 0, 0));
+      canvas.setPenColor(COLOR_RED);
       canvas.drawText(MIDDLE_POS-32+t, 17*8, " ACCELERATE TO START ");              
     }
     else
     {
-      canvas.setPenColor(RGB888(0xff, 0xff, 0xff));
+      canvas.setPenColor(COLOR_WHITE);
       canvas.drawText(MIDDLE_POS-28+t, 17*8, " MOVE LEFT OR RIGHT  ");          
     }
         
@@ -129,26 +119,15 @@ struct Menu : public Scene
       if( controller->isButtonB() ) bExitB = true;
     }
 
-    if( gameControllers[playercontrol[LEFT]]->isButtonA() || 
-        gameControllers[playercontrol[LEFT]]->isUp() || 
-        gameControllers[playercontrol[RIGHT]]->isButtonA() || 
-        gameControllers[playercontrol[RIGHT]]->isUp()       
-        )
-    {
-      exitvalue = 1;
-      this->stop();  
-      return;    
-    }
-        
+    if( gameControllers[playercontrol[LEFT]]->isButtonA() || gameControllers[playercontrol[LEFT]]->isUp() || 
+        gameControllers[playercontrol[RIGHT]]->isButtonA() || gameControllers[playercontrol[RIGHT]]->isUp() )
+      exitValue = 1; 
+   
     if ( millis() > menulastactivity + MENU_TIMEOUT || bExitB )
-    {
-          exitvalue = 2;
-          this->stop();    
-          return;  
-    }
-              
+      exitValue = 2; 
+      
+    if( exitValue != -1 ) {this->stop(); return; }
   }
 
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint  ) {}
-
 };

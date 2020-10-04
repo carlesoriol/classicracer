@@ -9,24 +9,17 @@
 
 #define FORMAT_SPIFFS_IF_FAILED true
 
-//#include <string.h>
-
 const char *scoreFileName = "/score.dat";
 
 int highScore;
 int lowestTopScore;
 int fastest;
 
-RGB888 scorecolors[12] = { RGB888(255, 0, 0),RGB888(255, 255, 128),RGB888(255, 0, 255),
-                                        RGB888(0, 0, 255),RGB888(128, 255, 255),RGB888(255, 255,0 ),
-                                        
-                                        RGB888(128, 0, 0),RGB888(0, 128, 0),RGB888(128, 0, 128),
-                                        RGB888(0, 0, 128),RGB888(0, 128, 128),RGB888(128, 128, 0),
-
-                                        //RGB888(0b11000000, 0, 0),RGB888(0b10000000, 0, 0b00000000),RGB888(0b10000000, 0, 0b01000000),
-                                        //RGB888(0b10000000, 0, 0b10000000),RGB888(0b01000000, 0, 0b10000000),RGB888(0b00000000, 0, 0b11000000),
-                                        
-                                        };
+RGB888 scorecolors[12] = {  RGB888(255, 0, 0),RGB888(255, 255, 128),RGB888(255, 0, 255),
+                            RGB888(0, 0, 255),RGB888(128, 255, 255),RGB888(255, 255,0 ),
+                            RGB888(128, 0, 0),RGB888(0, 128, 0),RGB888(128, 0, 128),
+                            RGB888(0, 0, 128),RGB888(0, 128, 128),RGB888(128, 128, 0),
+                          };
 
 struct ScoreCard
 {
@@ -44,19 +37,19 @@ struct ScoreCard
   }
 };
 
-
-ScoreCard top[HIGHSCORE_ITEMS] = { { "COM", 1220, 143, 2,  0, 1 },
-                     { "NCW", 1200, 136, 1,  3, 2 },
-                     { "NOC", 1100, 160, 4,  1, 2 },
-                     { "MOC", 1050, 164, 4,  2, 1 },
-                     { "JCP",  900, 300, 12, 4, 2 },
-                     { "CMD",  800, 350, 18, 5, 1 },                       
-                     { "GCW",  200, 250, 28, 4, 1 },                       
-                     { "ACG",  200, 250, 28, 3, 1 },                       
-                     { "PLA",  200, 250, 28, 4, 1 },                       
-                     { "YTH",  200, 250, 28, 1, 1 },                       
-                     { "EGA",  200, 250, 28, 2, 2 },                       
-                     { "MEE",  200, 250, 28, 5, 2 },                       
+ScoreCard top[HIGHSCORE_ITEMS] = { 
+   { "COM", 1220, 143, 2,  0, 1 },
+   { "NCW", 1200, 136, 1,  3, 2 },
+   { "NOC", 1100, 160, 4,  1, 2 },
+   { "MOC", 1050, 164, 4,  2, 1 },
+   { "JCP",  900, 300, 12, 4, 2 },
+   { "CMD",  800, 350, 18, 5, 1 },                       
+   { "GCW",  200, 250, 28, 4, 1 },                       
+   { "ACG",  200, 250, 28, 3, 1 },                       
+   { "PLA",  200, 250, 28, 4, 1 },                       
+   { "YTH",  200, 250, 28, 1, 1 },                       
+   { "EGA",  200, 250, 28, 2, 2 },                       
+   { "MEE",  200, 250, 28, 5, 2 },                       
 };
 
 void saveScore()
@@ -69,7 +62,7 @@ void saveScore()
 
 bool loadScore()
 { 
-File file = SPIFFS.open(scoreFileName, "r");
+  File file = SPIFFS.open(scoreFileName, "r");
   if( !file) return false;          
   file.read ( (uint8_t *)&top, sizeof(struct ScoreCard)*HIGHSCORE_ITEMS);   
   file.close();
@@ -125,7 +118,7 @@ struct Score : public Scene
   long lastDraw = 0;
   Bitmap bitmap_cariconright = Bitmap(8, 8, bitmap_car_to_right_data, PixelFormat::Mask, RGB888(0, 0, 255));
   Sprite sprites[1];
-  int exitvalue = 0;
+  int exitValue = 0;
   int editItem = -1; // item number to edit
   int editInitial = 0; // 0 to 3
   int currentStart = 0;
@@ -150,11 +143,8 @@ struct Score : public Scene
 
   void slowRefresh( int cariconx=-1, int caricony = -1) 
   {     
-    if(cariconx != -1)    
-      sprites[0].x = cariconx; 
-    if(caricony != -1)    
-      sprites[0].y = caricony;
-
+    if(cariconx != -1)  sprites[0].x = cariconx; 
+    if(caricony != -1)  sprites[0].y = caricony;
     if( !bExit)
     {
       sprites[0].visible = true;
@@ -167,11 +157,10 @@ struct Score : public Scene
   void slowDratText(int x, int y, const char *text, int dx=8 )
   {
     char c[2];
-    *c = *text++;
     c[1] = 0;
-
-    slowRefresh( x, y );
     
+    *c = *text++;
+    slowRefresh( x, y );    
     while ( *c!= 0)
     {
       canvas.drawText(x, y, c );
@@ -179,21 +168,16 @@ struct Score : public Scene
       x += dx;
       slowRefresh( x+8, y );
       checkExit();
-    }
-    
-  }
-
-      
+    }    
+  }     
 
   void drawScores()
   {
-        Bitmap bitmap_classicracer = Bitmap(21*8, 16, bitmap_classicracer_data, PixelFormat::Mask, RGB888(255, 255, 255));      
+    Bitmap bitmap_classicracer = Bitmap(21*8, 16, bitmap_classicracer_data, PixelFormat::Mask, RGB888(255, 255, 255));      
     const uint8_t *bitmap_controls_list[6] = {bitmap_mouse_data,
                                               bitmap_mouse_data, bitmap_joystick_data,
                                               bitmap_keybb_data, bitmap_keyba_data,  bitmap_keybo_data  };
       
-
-
     int nselected = 1;
     
     canvas.setBrushColor(RGB888(0, 0xff, 0));
@@ -211,8 +195,6 @@ struct Score : public Scene
     canvas.setPenColor(RGB888(0xff, 0xff, 192));   
     canvas.drawText(9*8, 10*8, "NAME SCORE TIME CARS GAME");
     slowRefresh();
-
-
 
     if( editItem != -1) currentStart = editItem;
  
@@ -267,14 +249,12 @@ struct Score : public Scene
     
     slowRefresh( 400, 0);
     canvas.waitCompletion();
-    lastDraw = millis();
-    
+    lastDraw = millis();  
   }
-
 
   void init()
   {   
-    if( editItem != -1 )currentStart = 0;
+    if( editItem != -1 ) currentStart = 0;
     editInitial = 0;
     scorelastactivity = millis();
     sprites[0].addBitmap(&bitmap_cariconright);
@@ -284,15 +264,12 @@ struct Score : public Scene
     drawScores();      
   }
 
-
   void update( int updateCount )
   { 
-    
     if( editItem == -1 )
       checkExit();
     else
-    {
-    
+    {    
       bool bleft = false;
       bool bright = false;
       bool bfire = false;     
@@ -315,11 +292,11 @@ struct Score : public Scene
         if( bfire)
         {
           editInitial++;          
-          playPic();
+          playSoundPic();
           waitNoButton(1000);           // 1s max
         }
         else
-          playPong();
+          playSoundPong();
              
         canvas.setPenColor(scorecolors[editItem]);
         canvas.setBrushColor(RGB888(0,255,0) );
@@ -330,7 +307,7 @@ struct Score : public Scene
         {
             saveScore();
             bExit = true;
-            exitvalue = 2;
+            exitValue = 2;
             editItem = -1;
             VGAController.removeSprites();
             this->stop();                
@@ -351,7 +328,7 @@ struct Score : public Scene
      if ( bExit || millis() > scorelastactivity + SCORE_TIMEOUT )
      {
           canvas.waitCompletion();  
-          exitvalue = 0;
+          exitValue = 0;
           editItem = -1;
           VGAController.removeSprites();
           this->stop();                
@@ -366,5 +343,4 @@ struct Score : public Scene
   }
  
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint  ) {}
-
 };

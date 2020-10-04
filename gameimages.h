@@ -1,3 +1,7 @@
+#define COLOR_GREEN  RGB888(0x00, 0xff, 0x00)
+#define COLOR_YELLOW RGB888(0xff, 0xff, 0x00)
+#define COLOR_WHITE  RGB888(0xff, 0xff, 0xff)
+#define COLOR_RED    RGB888(0xff, 0x00, 0x00)
 
 const uint8_t carbitmap_data[] = {
    0b00000000, 0b01111100, 0b00000000,
@@ -7,8 +11,7 @@ const uint8_t carbitmap_data[] = {
    0b00111111, 0b11111111, 0b11111000,
    0b00111111, 0b11111111, 0b11111000,
    0b00111110, 0b01111100, 0b11111000,
-   0b00111110, 0b01111100, 0b11111000,
-   
+   0b00111110, 0b01111100, 0b11111000,  
    0b00000000, 0b01111100, 0b00000000,
    0b00000000, 0b01111100, 0b00000000,
    0b01111110, 0b01111100, 0b11111100,
@@ -16,16 +19,13 @@ const uint8_t carbitmap_data[] = {
    0b01111110, 0b01111100, 0b11111100,
    0b01111111, 0b11111111, 0b11111100,
    0b01111111, 0b11111111, 0b11111100,
-   0b01111110, 0b01111100, 0b11111100,
-   
+   0b01111110, 0b01111100, 0b11111100,   
    0b01111110, 0b01111100, 0b11111100,
    0b01111110, 0b01111100, 0b11111100,
    0b00000000, 0b00000000, 0b00000000,
    0b00000000, 0b00000000, 0b00000000,
    0b00000000, 0b00000000, 0b00000000,
 };
-Bitmap carbitmap = Bitmap(24, 21, carbitmap_data, PixelFormat::Mask, RGB888(0, 0, 255));
-Bitmap carbitmap_prota = Bitmap(24, 21, carbitmap_data, PixelFormat::Mask, RGB888(255, 255, 0));
 
 const uint8_t carbitmap_data_dreta[] = {
    0b00000000, 0b00111110, 0b00000000,
@@ -51,9 +51,6 @@ const uint8_t carbitmap_data_dreta[] = {
    0b00000000, 0b00000000, 0b00000000
 };
 
-Bitmap carbitmap_dreta = Bitmap(24, 21, carbitmap_data_dreta, PixelFormat::Mask, RGB888(255, 255, 0));
-
-
 const uint8_t carbitmap_data_esquerra[] = {
    0b00000000, 0b11111000, 0b00000000,
    0b00000000, 0b11111000, 0b00000000,
@@ -78,8 +75,6 @@ const uint8_t carbitmap_data_esquerra[] = {
    0b00000000, 0b00000000, 0b00000000
 };
 
-Bitmap carbitmap_esquerra = Bitmap(24, 21, carbitmap_data_esquerra, PixelFormat::Mask, RGB888(255, 255, 0));
-
 const uint8_t carbitmap_data_crash[] = {
   0x01, 0xF8, 0x00,
   0x00, 0xFC, 0x1F,
@@ -103,7 +98,6 @@ const uint8_t carbitmap_data_crash[] = {
   0x00, 0x00, 0x00,
   0x00, 0x00, 0x00,
 };
-Bitmap carbitmap_crash = Bitmap(24, 21, carbitmap_data_crash, PixelFormat::Mask, RGB888(255, 191, 0));
 
 const uint8_t carbitmap_data_crash2[] = {
     0,  31, 128,
@@ -128,7 +122,6 @@ const uint8_t carbitmap_data_crash2[] = {
     0,   0,   0,
     0,   0,   0
 };
-Bitmap carbitmap_crash2 = Bitmap(24, 21, carbitmap_data_crash2, PixelFormat::Mask, RGB888(255, 64, 0));
 
 const uint8_t carbitmap_data_anim0[] = {
 0x00, 0x7C, 0x00,
@@ -212,15 +205,6 @@ const uint8_t carbitmap_data_anim2[] = {
 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00,
 };
-
-Bitmap carbitmap_anim[3] = { Bitmap(24, 21, carbitmap_data_anim0, PixelFormat::Mask, RGB888(255, 255, 0)),
-                             Bitmap(24, 21, carbitmap_data_anim1, PixelFormat::Mask, RGB888(255, 255, 0)),
-                             Bitmap(24, 21, carbitmap_data_anim2, PixelFormat::Mask, RGB888(255, 255, 0)) };
-
-Bitmap carbitmap_banim[3] = { Bitmap(24, 21, carbitmap_data_anim0, PixelFormat::Mask, RGB888(0, 0, 255)),
-                             Bitmap(24, 21, carbitmap_data_anim1, PixelFormat::Mask, RGB888(0, 0, 255)),
-                             Bitmap(24, 21, carbitmap_data_anim2, PixelFormat::Mask, RGB888(0, 0, 255)) };
-
 
 #define FONT_SCALE 4
 #define FONT_WIDTH 3
@@ -310,8 +294,6 @@ const  uint8_t number_data_3x5[10][8] = {
   
 };
 
-
-
 const  uint8_t won_data[] =
 {
   // 16x8
@@ -324,7 +306,6 @@ const  uint8_t won_data[] =
       0b00000000,0b00000000,
       0b00000000,0b00000000,
 };
-
 
 const  uint8_t lost_data[] =
 {
@@ -361,7 +342,6 @@ const uint8_t bitmap_classicracer_data[] = {
 
 };
 
-
 const uint8_t bitmap_caricon_data[] = {
 
      0b00011000,
@@ -386,9 +366,7 @@ const uint8_t bitmap_cariconright_data[] = {
      0b01101100,
 };
 
-
 const uint8_t bitmap_cariconleft_data[] = {
-
 
      0b00001100,
      0b00101100,
@@ -419,7 +397,6 @@ const uint8_t bitmap_keyba_data[] = {
      0b11011010,
      0b11011010,
      0b11111011,
-     
      0b11011011,
      0b00000011,
      0b11111111,
@@ -443,8 +420,7 @@ const uint8_t bitmap_keybo_data[] = {
      0b11111010,
      0b10101010,
      0b10111010,
-     0b10100011,
-     
+     0b10100011,    
      0b11100011,
      0b00000011,
      0b11111111,
@@ -469,8 +445,7 @@ const uint8_t bitmap_car_to_right_data[] = {
      0b11100000,
      0b11101110,
      0b01000100,
-     0b11111111,
-     
+     0b11111111,     
      0b11111111,
      0b01000100,
      0b11101110,

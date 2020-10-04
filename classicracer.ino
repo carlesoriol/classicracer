@@ -27,7 +27,6 @@ GameController *gameControllers[] = { &cNone, &cMouse, &cJoystick, &cKeysArrows,
 
 #include "support.h"
 #include "soundchip.h"
-
 #include "score.h"
 #include "race.h"
 #include "menu.h"
@@ -46,10 +45,8 @@ void setup()
   cKeysQAOP   = GameControllerKeys (5, fabgl::VK_q, fabgl::VK_a, fabgl::VK_o, fabgl::VK_p, fabgl::VK_SPACE, fabgl::VK_ESCAPE );
 
   VGAController.begin();
-  //VGAController.setResolution(VGA_320x200_75Hz, 320, 200);
-  //VGAController.setResolution("\"320x200@Hz\" 12.6 320 328 376 400 200 225 248 262 -HSync -VSync DoubleScan", 320, 200);
-  VGAController.setResolution("\"320x200@75Hz\" 12.93 320 355 379 408 200 208 211 229 -HSync -VSync DoubleScan FrontPorchBegins");
-  VGAController.moveScreen(-3, 0);
+  VGAController.setResolution(VGA_320x200_75Hz, 320, 200);
+  VGAController.moveScreen(-6, 0);
   soundGenerator.setVolume(127);
   soundGenerator.play(true);
   soundGenerator.attach( &swg);
@@ -57,19 +54,18 @@ void setup()
   initNumbers();  
 
   SPIFFS.begin(true);      
-  //loadScore();
+  loadScore();
   highScore = top[0].points;
   fastest = top[0].timesec; 
   lowestTopScore = top[HIGHSCORE_ITEMS-1].points;
 }
-
 
 void loop()
 {
     static int exitv = 0;    
     static int editItem = -1;
 
-    playTuc();
+    playSoundTuc();
     waitNoButton(250); // No button pressing between scene change
     
     if ( exitv == 2 )
@@ -78,7 +74,7 @@ void loop()
       score.editItem = editItem;      
       score.start();      
       editItem = -1;
-      exitv = score.exitvalue;      
+      exitv = score.exitValue;      
     }    
     else if ( exitv == 1 )
     {
@@ -113,8 +109,6 @@ void loop()
     {
       Menu menu;
       menu.start();
-      exitv = menu.exitvalue;
-
-
+      exitv = menu.exitValue;
     }    
 }
