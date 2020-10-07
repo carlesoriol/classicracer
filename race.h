@@ -36,7 +36,36 @@ struct Race : public Scene
                              Bitmap(24, 21, carbitmap_data_anim2, PixelFormat::Mask, RGB888(0, 0, 255)) };
 
   struct Player
-  {
+  {    
+    int player;
+    Sprite *sprite;
+
+    int xspeed;
+    int yspeed;
+
+    int lastCar;
+    int lastCarSprite;
+
+    int score, points;
+
+    bool crashed;
+    long crashTime;
+    int cars;
+    int dcrashx;
+
+    int minx;
+    int maxx;
+
+    int level ;
+    GameController *controller;
+
+    int wheel_sound_mult = 1;
+
+    SawtoothWaveformGenerator carEngineSound;
+    SawtoothWaveformGenerator carAdvanceSound;
+    NoiseWaveformGenerator carCrashSound;
+    SawtoothWaveformGenerator carWheelSound;
+    
     Player()
     {
       xspeed = 0; yspeed = 60; lastCar = 0; lastCarSprite = 0;
@@ -208,36 +237,6 @@ struct Race : public Scene
       }
     }
 
-    int player;
-    Sprite *sprite;
-
-    int xspeed;
-    int yspeed;
-
-    int lastCar;
-    int lastCarSprite;
-
-    int score, points;
-
-    bool crashed;
-    long crashTime;
-    int cars;
-    int dcrashx;
-
-    int minx;
-    int maxx;
-
-    int level ;
-    GameController *controller;
-
-    int wheel_sound_mult = 1;
-
-    SawtoothWaveformGenerator carEngineSound;
-    SawtoothWaveformGenerator carAdvanceSound;
-    NoiseWaveformGenerator carCrashSound;
-    SawtoothWaveformGenerator carWheelSound;
-
-
     void showSpeed( )
     {
       int x = ((player == 0) ? 2 : 314) ;
@@ -258,7 +257,6 @@ struct Race : public Scene
 
       if (score == 5 ) level = 2;
       if (score == 10 ) level = 3;
-
     }
 
     void update()
@@ -282,8 +280,6 @@ struct Race : public Scene
       sprintf( buffer, "%02d", cars );
       canvas.drawText(19 * 8, (player == 0 ? 22 : 23) * 8, buffer);
     }
-
-
   };
 
   Player players[2];
@@ -393,7 +389,6 @@ struct Race : public Scene
       canvas.setBrushColor(RGB888(0xff, 0xff, 0));
       canvas.drawBitmap( 19 * 8 + 2, 6 * 8, &numbers_bitmaps[(minuts / 10)]);
       canvas.drawBitmap( 19 * 8 + 2, 9 * 8, &numbers_bitmaps[(minuts % 10)]);
-
       canvas.drawBitmap( 19 * 8 + 2, 14 * 8, &numbers_bitmaps[(segons / 10)]);
       canvas.drawBitmap( 19 * 8 + 2, 17 * 8, &numbers_bitmaps[(segons % 10)]);
 
@@ -442,7 +437,6 @@ struct Race : public Scene
     canvas.setPenColor(RGB888(0xff, 0XFF, 0));
     sprintf( buffer, "%04d", highScore );
     canvas.drawText(18 * 8, 8, buffer);
-
 
     canvas.setPenColor(RGB888(0xff, 0XFF, 0));
     sprintf( buffer, "%02d", fastest / 60 );

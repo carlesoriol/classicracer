@@ -316,7 +316,6 @@ struct Score : public Scene
         canvas.waitCompletion(); 
     }
 
-    
      if ( bExit || millis() > scorelastactivity + SCORE_TIMEOUT )
      {
           canvas.waitCompletion();  

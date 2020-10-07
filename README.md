@@ -3,14 +3,16 @@
 
 A neo retro game
 
-Thanks to www.FabGL.com - 2019 by Fabrizio Di Vittorio for this amazing library. This guy is really amazing, I've enjkoyed a lot just watching the samples of his libraries it's so GREAT!!
+Thanks to www.FabGL.com - 2019 by Fabrizio Di Vittorio for this amazing library. This guy is really amazing, I've enjoyed a lot just watching the samples of his libraries it's so GREAT!!
 
 Thanks to Shenzhen Xin Yuan Electronics for creating the funny TTGO VGA32 http://www.lilygo.cn/.
 
-I've enjoyed playing with it.
+I't has been great playing with it.
 
 
-22/8/2020 - Version 0.1
+Since 22/8/2020
+
+Version 0.9
 
 https://github.com/carlesoriol/classicracer
 
@@ -24,7 +26,7 @@ I know I'm an speccy person. But It was too strong the temptation to do it on 32
 
 I've also simulated the 64 SID sound with ADSR wave definitions.
 
-Maybe I will create some fun version for spectrum (or spectrum next), mocodore amd for modern computers like the raspberry with raylib.
+Maybe I will create some fun version for spectrum (or spectrum next), mocodore or for super-modern super-computers like the raspberry with raylib.
 
 ## Game controls
 
@@ -41,6 +43,8 @@ Move left or right on the home screen to select the controls
 Only game winners enter in the hall of fame. 
 
 If you have an excelent score but you don't win. HOF is nopt for you :-D
+
+Scores are stored in spiffs
 
 ## License
 [AGPL](https://choosealicense.com/licenses/agpl/)
