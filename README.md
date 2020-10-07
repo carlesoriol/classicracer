@@ -1,6 +1,8 @@
 # FabGL ClassicRacer
 8 bits classic racer for FabGL
 
+![Alt text](fotos.jpg)
+
 A neo retro game, recreating the smell, look and feel of my children games.
 Reference game Soundic Programmable Car Race GP https://www.youtube.com/watch?v=zVEe7g6gyFM
 
