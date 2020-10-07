@@ -18,13 +18,12 @@ Version 0.9
 
 https://github.com/carlesoriol/classicracer
 
-
 Carles Oriol - Barcelona 2020
 carlesoriol@gmail.com
 
 ## About the game
 
-I know I'm an speccy person. But It was too strong the temptation to do it on 320x200 with 8 sprites like an Mocodore 64.  :-DDD
+I know I'm a speccy person. But It was too strong the temptation to do it on 320x200 with 8 sprites like a Mocodore 64. :-DDD
 
 I've also simulated the 64 SID sound with ADSR wave definitions.
 
@@ -38,14 +37,14 @@ Move left or right on the home screen to select the controls
 - Keyboard
 - Keys: QAOP - So speccy
 - Arrow keys
-- Kesy: ASTF 
-- Joystick. (I use a classic atari 2600 joystick connected at pins: JOY_LEFT 13, JOY_RIGHT 2, JOY_DOWN 14, JOY_FIRE 12)
+- Keys: ASTF
+- Joystick. (I use a classic Atari 2600 joystick connected at pins: JOY_LEFT 13, JOY_RIGHT 2, JOY_DOWN 14, JOY_FIRE 12)
 
 Play with friends or family is always more funny. Create your competitions.
 
 ## Game score
 
-To win you have go pass 200 cars before your adversari
+To win you have to advance 200 cars before your adversary
 
 Each car will give you more or less score depending on your speed
 
@@ -53,9 +52,9 @@ If you arrive to the finish line without crashing a sweet bonus is waiting for y
 
 ## Hall of fame
 
-Only game winners enter in the hall of fame. 
+Only game winners enter the hall of fame.
 
-If you have an excelent score but you don't win. HOF is nopt for you :-D
+If you have an excellent score but you don't win. HOF is not for you :-D
 
 Scores are stored in spiffs
 
