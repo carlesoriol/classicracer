@@ -1,7 +1,8 @@
 # FabGL ClassicRacer
 8 bits classic racer for FabGL
 
-A neo retro game
+A neo retro game, recreating the smell, look and feel of my children games.
+Reference game Soundic Programmable Car Race GP https://www.youtube.com/watch?v=zVEe7g6gyFM
 
 Thanks to www.FabGL.com - 2019 by Fabrizio Di Vittorio for this amazing library. This guy is really amazing, I've enjoyed a lot just watching the samples of his libraries it's so GREAT!!
 
@@ -9,6 +10,7 @@ Thanks to Shenzhen Xin Yuan Electronics for creating the funny TTGO VGA32 http:/
 
 I't has been great playing with it.
 
+Thanks to my Nurieta for being everything else in my life.
 
 Since 22/8/2020
 
@@ -32,11 +34,22 @@ Maybe I will create some fun version for spectrum (or spectrum next), mocodore o
 
 Move left or right on the home screen to select the controls
 
-- Mouse
+- Mouse - Easiest to win
 - Keyboard
-- Keys: QAOP
+- Keys: QAOP - So speccy
 - Arrow keys
 - Kesy: ASTF 
+- Joystick. (I use a classic atari 2600 joystick connected at pins: JOY_LEFT 13, JOY_RIGHT 2, JOY_DOWN 14, JOY_FIRE 12)
+
+Play with friends or family is always more funny. Create your competitions.
+
+## Game score
+
+To win you have go pass 200 cars before your adversari
+
+Each car will give you more or less score depending on your speed
+
+If you arrive to the finish line without crashing a sweet bonus is waiting for you.
 
 ## Hall of fame
 
